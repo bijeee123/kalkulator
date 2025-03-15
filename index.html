@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+        .calculator-grid button {
+            padding: 1.5rem;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col justify-between" onkeydown="handleKeyPress(event)">
+    <div class="flex justify-between items-center p-4">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-bars text-xl"></i>
+            <span class="text-lg font-semibold">Standard</span>
+            <i class="fas fa-clock text-xl"></i>
+        </div>
+        <div class="flex space-x-4">
+            <span class="text-lg font-bold">History</span>
+        </div>
+    </div>
+    <div class="flex justify-between items-center p-4">
+        <div id="display" class="text-4xl">0</div>
+        <div id="history" class="text-sm">There's no history yet.</div>
+    </div>
+    <div class="calculator-grid p-4">
+        <button class="bg-gray-800" onclick="appendCharacter('%')">%</button>
+        <button class="bg-gray-800" onclick="clearEntry()">CE</button>
+        <button class="bg-gray-800" onclick="clearDisplay()">C</button>
+        <button class="bg-gray-800" onclick="deleteCharacter()"><i class="fas fa-backspace"></i></button>
+        <button class="bg-gray-800" onclick="appendCharacter('1/')">1/x</button>
+        <button class="bg-gray-800" onclick="appendCharacter('**2')">x²</button>
+        <button class="bg-gray-800" onclick="calculateSquareRoot()">√x</button>
+        <button class="bg-gray-800" onclick="appendCharacter('/')">÷</button>
+        <button class="bg-gray-800" onclick="appendCharacter('7')">7</button>
+        <button class="bg-gray-800" onclick="appendCharacter('8')">8</button>
+        <button class="bg-gray-800" onclick="appendCharacter('9')">9</button>
+        <button class="bg-gray-800" onclick="appendCharacter('*')">×</button>
+        <button class="bg-gray-800" onclick="appendCharacter('4')">4</button>
+        <button class="bg-gray-800" onclick="appendCharacter('5')">5</button>
+        <button class="bg-gray-800" onclick="appendCharacter('6')">6</button>
+        <button class="bg-gray-800" onclick="appendCharacter('-')">-</button>
+        <button class="bg-gray-800" onclick="appendCharacter('1')">1</button>
+        <button class="bg-gray-800" onclick="appendCharacter('2')">2</button>
+        <button class="bg-gray-800" onclick="appendCharacter('3')">3</button>
+        <button class="bg-gray-800" onclick="appendCharacter('+')">+</button>
+        <button class="bg-gray-800" onclick="toggleSign()">+/-</button>
+        <button class="bg-gray-800" onclick="appendCharacter('0')">0</button>
+        <button class="bg-gray-800" onclick="appendCharacter('.')">,</button>
+        <button class="bg-pink-500" onclick="calculateResult()">=</button>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const history = document.getElementById('history');
+
+        function appendCharacter(character) {
+            if (display.innerText === '0') {
+                display.innerText = character;
+            } else {
+                display.innerText += character;
+            }
+        }
+
+        function clearEntry() {
+            display.innerText = '0';
+        }
+
+        function clearDisplay() {
+            display.innerText = '0';
+        }
+
+        function deleteCharacter() {
+            if (display.innerText.length > 1) {
+                display.innerText = display.innerText.slice(0, -1);
+            } else {
+                display.innerText = '0';
+            }
+        }
+
+        function calculateResult() {
+            try {
+                const expression = display.innerText.replace('÷', '/').replace('×', '*');
+                const result = eval(expression);
+                if (result === Infinity || result === -Infinity || isNaN(result)) {
+                    display.innerText = 'Error';
+                } else {
+                    addToHistory(display.innerText + ' = ' + result);
+                    display.innerText = result;
+                }
+            } catch {
+                display.innerText = 'Error';
+            }
+        }
+
+        function calculateSquareRoot() {
+            try {
+                const value = parseFloat(display.innerText);
+                if (value < 0) {
+                    display.innerText = 'Error';
+                } else {
+                    const result = Math.sqrt(value);
+                    addToHistory('√' + value + ' = ' + result);
+                    display.innerText = result;
+                }
+            } catch {
+                display.innerText = 'Error';
+            }
+        }
+
+        function toggleSign() {
+            try {
+                const value = parseFloat(display.innerText);
+                const result = value * -1;
+                display.innerText = result;
+            } catch {
+                display.innerText = 'Error';
+            }
+        }
+
+        function addToHistory(entry) {
+            if (history.innerText === "There's no history yet.") {
+                history.innerText = entry;
+            } else {
+                history.innerText += '\n' + entry;
+            }
+        }
+
+        function handleKeyPress(event) {
+            const key = event.key;
+            if (key >= '0' && key <= '9') {
+                appendCharacter(key);
+            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                appendCharacter(key);
+            } else if (key === 'Enter') {
+                calculateResult();
+            } else if (key === 'Backspace') {
+                deleteCharacter();
+                
+            } else if (key === 'Escape') {
+                clearDisplay();
+            } else if (key === '.') {
+                appendCharacter('.');
+            }
+        }
+    </script>
+</body>
+</html>
